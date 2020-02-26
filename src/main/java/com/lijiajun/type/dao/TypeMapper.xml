@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+ "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.lijiajun.type.dao.TypeMapper">
+  <!-- 查询 -->
+ <select id="select" resultMap="listMap">
+ 	select goods_type.* from goods_type join goods on goods_type.type_id=goods.type_id
+		<where>
+			<if test="type_types!=null and type_types!=''">and type_types concat('%',#{type_types},'%')</if>
+			<if test="brand_name!=null and brand_name!=''">and brand_name=#{brand_name}</if>
+			<if test="p1!=null and p1!=0">and type_price&gt;=#{p1}</if>
+			<if test="p2!=null and p2!=0">and type_price&lt;=#{p2}</if>
+			<if test="type_name!=null and type_name!=''">and type_name concat('%',#{type_name},'%')</if>
+			<if test="brand_english!=null and brand_english!=''">and brand_english concat('%',#{brand_english},'%')</if>
+			<if test="type_title!=null and type_title!=''">and type_title=#{type_title}</if>
+		</where>
+	group by goods_type.type_id
+ </select>
+	<resultMap type="GoodsType" id="listMap">
+		<id  property="type_id" column="type_id"/>
+		<result property="type_name" column="type_name"/>
+		<result property="type_types" column="type_types"/>
+		<result property="type_size" column="type_size"/>
+		<result property="type_price" column="type_price"/>
+		<result property="type_now" column="type_now"/>
+		<result property="type_title" column="type_title"/>
+		<result property="type_pic" column="type_pic"/>
+		<collection property="brands" ofType="GoodsBrand" column="type_id" select="findBytype_id"></collection>
+	</resultMap>
+	<select id="findBytype_id" resultType="GoodsBrand">
+		select * from goods_brand join goods on goods_brand.brand_id=goods.brand_id 
+		where goods.goods_id=#{type_id} 
+	</select>
+	
+	<!-- 商品种类 -->
+	<select id="listType" resultType="GoodsType">
+		select * from goods_type
+	</select>
+	<!-- 商品品牌 -->
+	<select id="listBrand" resultType="GoodsBrand">
+		select * from goods_type
+	</select>
+	
+	<!-- 添加 -->
+	<insert id="add">
+		insert into goods_type values(null,#{type_name},#{type_types},#{type_size},#{type_price},#{type_now},#{type_title},#{type_pic})
+	</insert>
+</mapper>
